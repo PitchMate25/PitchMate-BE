@@ -1,6 +1,6 @@
 # PitchMate-BE
 
-FastAPI + MongoDB를 Docker Compose로 실행하는 협업용 템플릿.
+FastAPI + MongoDB를 Docker Compose로 실행
 
 ## 빠른 시작
 ```bash
@@ -11,7 +11,10 @@ cp .env.example .env   # 실제 비밀값으로 수정
 docker compose up --build -d
 
 # 3) 확인
-# API 문서
+## API 문서
 http://localhost:8000/docs
-# Mongo 웹 콘솔
+## 헬스 체크
+http://localhost:8000/health
+## Mongo 웹 콘솔 (mongo-express)
 http://localhost:8081
+```
