@@ -1,0 +1,44 @@
+version: "3.9"
+
+services:
+  api:
+    build: ./backend
+    container_name: pitchmate-api
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/app:/app/app  # 코드 핫리로드
+    depends_on:
+      - mongodb
+    restart: unless-stopped
+
+  mongodb:
+    image: mongo:7
+    container_name: pitchmate-mongo
+    ports:
+      - "27017:27017"  # (선택) 로컬에서 DB 클라이언트로 접속할 때만 필요
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+    volumes:
+      - mongo-data:/data/db
+    restart: unless-stopped
+
+  mongo-express:
+    image: mongo-express:1.0.2-20
+    container_name: pitchmate-mongo-express
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - ME_CONFIG_BASICAUTH=false  # 내부용이라 비활성 (외부공개 시 true로 바꾸고 사용자/비번 설정)
+    depends_on:
+      - mongodb
+    restart: unless-stopped
+
+volumes:
+  mongo-data:
