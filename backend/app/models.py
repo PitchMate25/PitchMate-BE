@@ -1,20 +1,18 @@
-from typing import Optional
-from pydantic import BaseModel, Field
-from pydantic import ConfigDict
+from typing import List, Annotated
+from pydantic import BaseModel, Field, ConfigDict
+from pydantic.functional_validators import BeforeValidator
 from bson import ObjectId
 
-class PyObjectId(ObjectId):
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
+def to_object_id_str(v):
+    # 스키마는 str로 노출, 내부 검증은 여기서
+    if isinstance(v, ObjectId):
+        return str(v)
+    if isinstance(v, str) and ObjectId.is_valid(v):
+        return v  # 이미 문자열 ObjectId
+    raise ValueError("Invalid ObjectId")
 
-    @classmethod
-    def validate(cls, v):
-        if isinstance(v, ObjectId):
-            return v
-        if not ObjectId.is_valid(v):
-            raise ValueError("Invalid ObjectId")
-        return ObjectId(v)
+# 스키마 타입은 str, 검증은 BeforeValidator로 처리
+PyObjectId = Annotated[str, BeforeValidator(to_object_id_str)]
 
 class PitchCreate(BaseModel):
     title: str = Field(..., min_length=1, max_length=200)
@@ -27,8 +25,8 @@ class PitchOut(BaseModel):
     content: str
     author: str
 
+    # Pydantic v2 설정
     model_config = ConfigDict(
         populate_by_name=True,
         arbitrary_types_allowed=True,
-        json_encoders={ObjectId: str},
     )
