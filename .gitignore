@@ -216,7 +216,6 @@ __pycache__/
 
 # Env & local
 .env
-.env.*
 .DS_Store
 .idea/
 .vscode/
