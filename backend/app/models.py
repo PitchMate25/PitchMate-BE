@@ -1,32 +1,15 @@
-from typing import List, Annotated
-from pydantic import BaseModel, Field, ConfigDict
-from pydantic.functional_validators import BeforeValidator
-from bson import ObjectId
+from sqlalchemy import String, BigInteger, DateTime, func, UniqueConstraint
+from sqlalchemy.orm import Mapped, mapped_column
+from .database import Base
 
-def to_object_id_str(v):
-    # 스키마는 str로 노출, 내부 검증은 여기서
-    if isinstance(v, ObjectId):
-        return str(v)
-    if isinstance(v, str) and ObjectId.is_valid(v):
-        return v  # 이미 문자열 ObjectId
-    raise ValueError("Invalid ObjectId")
+class User(Base):
+    __tablename__ = "app_user"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    provider: Mapped[str] = mapped_column(String(20), nullable=False)   # 'google'|'kakao'|'naver'
+    external_id: Mapped[str] = mapped_column(String(100), nullable=False) # provider user id (sub)
+    email: Mapped[str | None] = mapped_column(String(255))
+    name: Mapped[str | None] = mapped_column(String(255))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    last_login_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
-# 스키마 타입은 str, 검증은 BeforeValidator로 처리
-PyObjectId = Annotated[str, BeforeValidator(to_object_id_str)]
-
-class PitchCreate(BaseModel):
-    title: str = Field(..., min_length=1, max_length=200)
-    content: str = Field(..., min_length=1)
-    author: str = Field(..., min_length=1, max_length=50)
-
-class PitchOut(BaseModel):
-    id: PyObjectId = Field(alias="_id")
-    title: str
-    content: str
-    author: str
-
-    # Pydantic v2 설정
-    model_config = ConfigDict(
-        populate_by_name=True,
-        arbitrary_types_allowed=True,
-    )
+    __table_args__ = (UniqueConstraint("provider", "external_id", name="uq_provider_external"),)
