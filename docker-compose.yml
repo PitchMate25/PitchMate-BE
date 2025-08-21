@@ -8,8 +8,6 @@ services:
       - "8000:8000"
     volumes:
       - ./backend/app:/app/app  # 코드 핫리로드
-    depends_on:
-      - mongodb
     restart: unless-stopped
 
   db:
@@ -29,7 +27,7 @@ services:
       - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
       - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
     ports:
-      - "8085:8085"
+      - "8085:80"
 
 volumes:
-  mongo-data:
+  pgdata:
