@@ -10,3 +10,4 @@ alembic
 python-jose[cryptography]
 authlib
 httpx
+itsdangerous>=2.2

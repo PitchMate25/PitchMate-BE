@@ -1,4 +1,5 @@
-from sqlalchemy import String, BigInteger, DateTime, func, UniqueConstraint
+from datetime import datetime
+from sqlalchemy import String, BigInteger, DateTime, func, UniqueConstraint  # UniqueConstraint 쓰면 함께 임포트
 from sqlalchemy.orm import Mapped, mapped_column
 from .database import Base
 
