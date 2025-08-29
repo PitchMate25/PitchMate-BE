@@ -11,3 +11,7 @@ python-jose[cryptography]
 authlib
 httpx
 itsdangerous>=2.2
+tenacity
+langchain
+langchain-mcp-adapters
+openai
