@@ -9,6 +9,9 @@ from .config import settings
 from .database import engine, Base
 from .auth import router as auth_router
 from .security import get_current_user_claims
+from .mcp_router import router as mcp_router
+from .agent_router import router as agent_router
+from .routers.external import router as external_router
 
 app = FastAPI(title="PitchMate API", version="0.1.0")
 
@@ -24,6 +27,10 @@ app.add_middleware(
 )
 
 app.include_router(auth_router)
+# 외부 툴(MCP), AI 에이전트, 여행/레저 외부 API 라우터 등록
+app.include_router(mcp_router)
+app.include_router(agent_router)
+app.include_router(external_router)
 
 @app.on_event("startup")
 async def startup():
